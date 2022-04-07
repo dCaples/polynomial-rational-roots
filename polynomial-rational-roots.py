@@ -1,3 +1,104 @@
+# CAS code
+
+import math
+
+def primefactors(n):
+    factors = []
+    #even number divisible
+    while n % 2 == 0:
+        factors.append(2)
+        n = n / 2
+    
+    #n became odd
+    for i in range(3,int(math.sqrt(n))+1,2):
+        while (n % i == 0):
+            factors.append(i)
+            n = n / i
+    
+    if n > 2:
+        factors.append(n)
+    return factors
+ 
+class Number:
+    def __init__(self, value):
+        self.value = value
+        self.factors = primefactors(abs(value))
+        # get the sign of value
+        if value < 0:
+            self.sign = -1
+        else:
+            self.sign = 1
+    def update_value(self):
+        self.value = 1
+        for factor in self.factors:
+            self.value *= factor
+        self.value *= self.sign
+
+class Fraction:
+    def __init__(self, numerator, denominator):
+        self.numerator = numerator
+        self.denominator = denominator
+        self.value = numerator.value/denominator.value
+        # reduce the fraction by cancelling common factors
+        # for each factor in the numerator go through the denominator and cancel it out
+        for factor in self.numerator.factors:
+            for denom_factor in self.denominator.factors:
+                if factor == denom_factor:
+                    # set both to 1
+                    self.numerator.factors.remove(factor)
+                    self.denominator.factors.remove(denom_factor)
+        # if the numerator is empty, add 1 to it
+        if len(self.numerator.factors) == 0:
+            self.numerator.factors.append(1)
+        # if the denominator is empty, add 1 to it
+        if len(self.denominator.factors) == 0:
+            self.denominator.factors.append(1)
+        # find the fraction sign
+        self.sign = self.numerator.sign * self.denominator.sign
+    def update_value(self):
+        # the numerator value is the product of numerator factors
+        self.numerator.value = 1
+        for factor in self.numerator.factors:
+            self.numerator.value *= factor
+        # the denominator value is the product of denominator factors
+        self.denominator.value = 1
+        for factor in self.denominator.factors:
+            self.denominator.value *= factor
+        # update the value of the fraction
+        self.value = self.numerator.value/self.denominator.value * self.sign
+
+
+def multiply(num1, num2):
+    # the numbers can either be fractions or numbers
+    # if the numbers are numbers, convert them to fractions
+    if type(num1) == Number:
+        num1 = Fraction(num1, Number(1))
+    if type(num2) == Number:
+        num2 = Fraction(num2, Number(1))
+    # multiply the fractions
+    # start by adding the numerator factor lists together
+    numerator_factors = num1.numerator.factors + num2.numerator.factors
+    # add the denominator factor lists together
+    denominator_factors = num1.denominator.factors + num2.denominator.factors
+    # multiply the numerator factors
+    numerator_value = 1
+    for factor in numerator_factors:
+        numerator_value *= factor
+    # multiply the denominator factors
+    denominator_value = 1
+    for factor in denominator_factors:
+        denominator_value *= factor
+    # create the new fraction
+    new_fraction = Fraction(Number(numerator_value), Number(denominator_value))
+    # set sign of the fraction
+    new_fraction.sign = num1.sign * num2.sign
+    # update the value of the fraction
+    new_fraction.update_value()
+    return new_fraction
+# end CAS code
+
+
+
 # ask user for first and last coefficients of a polynomial
 first = int(input("Enter the first coefficient: "))
 last = int(input("Enter the last coefficient: "))
@@ -6,7 +107,7 @@ last = int(input("Enter the last coefficient: "))
 first_factors = []
 last_factors = []
 
-def prime_factors(n):
+def factors(n):
     factor_list = []
     i = 1
     while i <= n:
@@ -17,8 +118,8 @@ def prime_factors(n):
             i += 1
     return factor_list
 
-first_factors = prime_factors(first)
-last_factors = prime_factors(last)
+first_factors = factors(first)
+last_factors = factors(last)
 
 # generate fractions from factors list
 # last factors will be the numerator
@@ -63,6 +164,7 @@ def deepcopy(obj):
 
 negative_fractions = deepcopy(fractions)
 
+
 fraction_index = 0
 print(len(negative_fractions))
 while fraction_index < len(negative_fractions):
@@ -71,6 +173,7 @@ while fraction_index < len(negative_fractions):
 
 # combine the two lists
 fractions.extend(negative_fractions)
+
 
 
 # print all of the fractions in fraction form
@@ -93,6 +196,15 @@ if check_roots == "y":
     check_roots = True
 else:
     check_roots = False
+
+###############################################################################################
+#                                   check the roots                                           #
+###############################################################################################
+# create exact fractions from the list of fractions using fraction and number classes
+exact_fractions = []
+for fraction in fractions:
+    exact_fractions.append(Fraction(Number(fraction[0]), Number(fraction[1])))
+
 
 # if check roots is true then ask for the polynomial
 if check_roots:
@@ -144,12 +256,26 @@ if check_roots:
 
     # plug possible roots into the polynomial
     roots = []
-    for root in possible_roots:
-        output = 0
-        for i in range(polynomial_degree + 1):
-            output += polynomial_coefficients[i]*(root[2]**i)
-        if output == 0:
-            roots.append(root)
+    # continue to synthetic divide until the polynomial can no longer be divided
+    division_possible = True
+    while division_possible:
+        # try to divide the polynomial by the possible roots
+        division_possible = False
+        for possible_root in possible_roots:
+            # if the polynomial can be divided by the possible root
+            if synthetic_division(possible_root[2], polynomial_coefficients):
+                # add the possible root to the roots list
+                roots.append(possible_root[2])
+                # the new polynomial is the remainder of the division
+                division_result = synthetic_division(possible_root[2], polynomial_coefficients)
+                # the result of division is forwards, but the coefficients are backwards
+                # so reverse the coefficients
+                division_result.reverse()
+                # the new polynomial is the remainder of the division
+                polynomial_coefficients = division_result
+                division_possible = True
+        # if the polynomial can no longer be divided, division_possible is false, and the loop will end
+
 
     # print the roots in latex form
     print("the roots are: ")
