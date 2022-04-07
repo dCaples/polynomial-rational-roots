@@ -3,6 +3,9 @@ import math
 
 def primefactors(n):
     factors = []
+    # if n is zero, return [0]
+    if n == 0:
+        return [0]
     #even number divisible
     while n % 2 == 0:
         factors.append(2)
