@@ -204,6 +204,7 @@ else:
 exact_fractions = []
 for fraction in fractions:
     exact_fractions.append(Fraction(Number(fraction[0]), Number(fraction[1])))
+print(exact_fractions)
 
 
 # if check roots is true then ask for the polynomial
