@@ -137,9 +137,13 @@ def add(num1, num2):
     # Fraction method only accepts Number objects
     return Fraction(Number(total_numerator), Number(common_denominator))
 
+def subtract(num1, num2):
+    num2.sign = -num2.sign
+    return add(num1, num2)
+
 fraction_1 = Fraction(Number(3), Number(8))
 fraction_2 = Fraction(Number(5), Number(8))
-multiplied = add(fraction_1, fraction_2)
+multiplied = subtract(fraction_1, fraction_2)
 print(multiplied.numerator.factors)
 print(multiplied.denominator.factors)
 print(multiplied.sign)
