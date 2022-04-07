@@ -40,6 +40,7 @@ class Number:
 
 class Fraction:
     def __init__(self, numerator, denominator):
+        # takes in 2 number objects
         self.numerator = numerator
         self.denominator = denominator
         self.value = numerator.value/denominator.value
@@ -274,7 +275,7 @@ if check_roots:
     # takes in a list of coefficients and dividing root and outputs false if the polynomial is not a root, and outputs new divided coefficients if it is a root
 
     def synthetic_division(divide_root, coefficients):
-        # coeeficients are Number objects
+        # coeeficients are fraction objects
         # divide_root is a Fraction object
         divide_root.sign = divide_root.sign * -1
         elements_number = len(coefficients)
@@ -283,13 +284,15 @@ if check_roots:
         out_array = []
         while k <= last_element_index:
             if k == 0:
-                out_array.append(Fraction(coefficients[k], Number(1)))
+                out_array.append(coefficients[k])
                 k+=1
                 # go to top of while loop 
                 continue
             else:
                 # out_array.append(out_array[-1]*divide_root + coefficients[k])
+                # out_array.append(add(multiply(out_array[-1], divide_root) , coefficients[k]))
                 out_array.append(add(multiply(out_array[-1], divide_root) , coefficients[k]))
+
                 k+=1
         if out_array[-1].numerator.value != 0:
             return False
@@ -297,8 +300,9 @@ if check_roots:
             out_array.pop()
             return out_array
 
-    out_array = synthetic_division(Number(1), [Number(1), Number(2), Number(1)])
+    out_array = synthetic_division(Fraction(Number(1), Number(1)), [Fraction(Number(1), Number(1)), Fraction(Number(2), Number(1)), Fraction(Number(1), Number(1))])
     for element in out_array:
+        # print result of synthetic division
         print(element.numerator.value, element.denominator.value)
 
 
