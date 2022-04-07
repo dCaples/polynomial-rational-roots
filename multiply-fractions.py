@@ -1,4 +1,3 @@
-from ast import Num
 import math
 
 def primefactors(n):
