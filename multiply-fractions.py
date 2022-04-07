@@ -1,3 +1,4 @@
+from ast import Num
 import math
 
 def primefactors(n):
@@ -15,6 +16,8 @@ def primefactors(n):
     
     if n > 2:
         factors.append(n)
+    if factors == []:
+        factors.append(1)
     return factors
  
 class Number:
@@ -45,6 +48,10 @@ class Fraction:
                     # set both to 1
                     self.numerator.factors.remove(factor)
                     self.denominator.factors.remove(denom_factor)
+        # if the numerator and denominator are equal, then the fraction is 1/1
+        if self.numerator.factors == self.denominator.factors:
+            self.numerator.factors = [1]
+            self.denominator.factors = [1]
         # if the numerator is empty, add 1 to it
         if len(self.numerator.factors) == 0:
             self.numerator.factors.append(1)
@@ -94,9 +101,45 @@ def multiply(num1, num2):
     new_fraction.update_value()
     return new_fraction
 
-fraction_1 = Fraction(Number(-4), Number(8))
-fraction_2 = Fraction(Number(-2), Number(3))
-multiplied = multiply(fraction_1, fraction_2)
+def reciprocal(num):
+    # the numbers can either be fractions or numbers
+    # if the numbers are numbers, convert them to fractions
+    if type(num) == Number:
+        num = Fraction(num, Number(1))
+    # switch the numerator and denominator
+    new_fraction = Fraction(num.denominator, num.numerator)
+    # set sign of the fraction
+    new_fraction.sign = num.sign
+    # update the value of the fraction
+    new_fraction.update_value()
+    return new_fraction
+
+def add(num1, num2):
+    # this only accepts fractions
+    # if the numbers are numbers, convert them to fractions
+    if type(num1) == Number:
+        num1 = Fraction(num1, Number(1))
+    if type(num2) == Number:
+        num2 = Fraction(num2, Number(1))
+
+
+    numerator_1 = num1.numerator.value * num1.sign
+    numerator_2 = num2.numerator.value * num2.sign
+
+    denominator_1 = num1.denominator.value
+    denominator_2 = num2.denominator.value
+    common_denominator = denominator_1 * denominator_2
+
+    numerator_1 = numerator_1 * denominator_2
+    numerator_2 = numerator_2 * denominator_1
+
+    total_numerator = numerator_1 + numerator_2
+    # Fraction method only accepts Number objects
+    return Fraction(Number(total_numerator), Number(common_denominator))
+
+fraction_1 = Fraction(Number(3), Number(8))
+fraction_2 = Fraction(Number(5), Number(8))
+multiplied = add(fraction_1, fraction_2)
 print(multiplied.numerator.factors)
 print(multiplied.denominator.factors)
 print(multiplied.sign)
