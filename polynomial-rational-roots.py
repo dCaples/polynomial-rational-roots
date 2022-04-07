@@ -274,6 +274,7 @@ if check_roots:
     # synthetic division function
     # takes in a list of coefficients and dividing root and outputs false if the polynomial is not a root, and outputs new divided coefficients if it is a root
 
+
     def synthetic_division(divide_root, coefficients):
         # coeeficients are fraction objects
         # divide_root is a Fraction object
@@ -300,28 +301,57 @@ if check_roots:
             out_array.pop()
             return out_array
 
-    out_array = synthetic_division(Fraction(Number(1), Number(1)), [Fraction(Number(1), Number(1)), Fraction(Number(2), Number(1)), Fraction(Number(1), Number(1))])
-    for element in out_array:
+    # test synthetic division
+    # out_array = synthetic_division(Fraction(Number(1), Number(1)), [Fraction(Number(1), Number(1)), Fraction(Number(2), Number(1)), Fraction(Number(1), Number(1))])
+    # for element in out_array:
         # print result of synthetic division
-        print(element.numerator.value, element.denominator.value)
+        # print(element.numerator.value, element.denominator.value)
+    
 
-
-
-    # print the roots in latex form
-    print("the roots are: ")
-    # create a list of the latex forms
-    roots_latex = []
+    # plug possible roots into the polynomial
+    # create list of possible roots in Fraction object form
+    possible_roots_fraction = []
+    for root in possible_roots:
+        possible_roots_fraction.append(Fraction(Number(root[0]), Number(root[1])))
+    roots = []
+    # make polynomial coefficient list into Fraction objects
+    polynomial_coefficients_fraction = []
+    for coefficient in polynomial_coefficients:
+        polynomial_coefficients_fraction.append(Fraction(Number(coefficient), Number(1)))
+    # continue to synthetic divide until the polynomial can no longer be divided
+    division_possible = True
+    while division_possible:
+        # try to divide the polynomial by the possible roots
+        #print the left over from division
+        print("Left over from division: ")
+        for element in polynomial_coefficients_fraction:
+            print(element.numerator.value)
+        division_possible = False
+        for possible_root in possible_roots_fraction:
+            # if the polynomial can be divided by the possible root
+            # add the possible root to the roots list
+            # the new polynomial is the remainder of the division
+            division_result = synthetic_division(possible_root, polynomial_coefficients_fraction)
+            # if the division worked
+            if division_result != False:
+                print("division worked when dividing by")
+                print(possible_root.numerator.value, "/", possible_root.denominator.value)
+                roots.append(possible_root)
+                # the result of division is forwards, but the coefficients are backwards
+                # so reverse the coefficients
+                division_result.reverse()
+                # the new polynomial is the remainder of the division
+                polynomial_coefficients_fraction = division_result
+                division_possible = True
+            else:
+                print ("division failed when attempting to divide by:")
+                print(possible_root.numerator.value,"/", possible_root.denominator.value)
+        # if the polynomial can no longer be divided, division_possible is false, and the loop will end
+    # print the roots
+    print("The roots are: ")
     for root in roots:
-        roots_latex.append("\\frac{" + str(root[0]) + "}{" + str(root[1]) + "}")
-    # create a string with all of the roots in latex form
-    roots_latex_string = ""
-    for root in roots_latex:
-        roots_latex_string += root + ", "
-    # remove last comma and space if there are roots
-    if roots_latex_string != "":
-        roots_latex_string = roots_latex_string[:-2]
+        print(root.numerator.value, root.denominator.value)
 
-    # print the string
-    print(roots_latex_string)
+
 else:
     print("Thank you for using this program!")
