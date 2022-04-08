@@ -1,9 +1,11 @@
 # CAS code
-
 import math
 
 def primefactors(n):
     factors = []
+    # if n is zero, return [0]
+    if n == 0:
+        return [0]
     #even number divisible
     while n % 2 == 0:
         factors.append(2)
@@ -17,6 +19,8 @@ def primefactors(n):
     
     if n > 2:
         factors.append(n)
+    if factors == []:
+        factors.append(1)
     return factors
  
 class Number:
@@ -36,6 +40,7 @@ class Number:
 
 class Fraction:
     def __init__(self, numerator, denominator):
+        # takes in 2 number objects
         self.numerator = numerator
         self.denominator = denominator
         self.value = numerator.value/denominator.value
@@ -47,6 +52,10 @@ class Fraction:
                     # set both to 1
                     self.numerator.factors.remove(factor)
                     self.denominator.factors.remove(denom_factor)
+        # if the numerator and denominator are equal, then the fraction is 1/1
+        if self.numerator.factors == self.denominator.factors:
+            self.numerator.factors = [1]
+            self.denominator.factors = [1]
         # if the numerator is empty, add 1 to it
         if len(self.numerator.factors) == 0:
             self.numerator.factors.append(1)
@@ -95,6 +104,46 @@ def multiply(num1, num2):
     # update the value of the fraction
     new_fraction.update_value()
     return new_fraction
+
+def reciprocal(num):
+    # the numbers can either be fractions or numbers
+    # if the numbers are numbers, convert them to fractions
+    if type(num) == Number:
+        num = Fraction(num, Number(1))
+    # switch the numerator and denominator
+    new_fraction = Fraction(num.denominator, num.numerator)
+    # set sign of the fraction
+    new_fraction.sign = num.sign
+    # update the value of the fraction
+    new_fraction.update_value()
+    return new_fraction
+
+def add(num1, num2):
+    # this only accepts fractions
+    # if the numbers are numbers, convert them to fractions
+    if type(num1) == Number:
+        num1 = Fraction(num1, Number(1))
+    if type(num2) == Number:
+        num2 = Fraction(num2, Number(1))
+
+
+    numerator_1 = num1.numerator.value * num1.sign
+    numerator_2 = num2.numerator.value * num2.sign
+
+    denominator_1 = num1.denominator.value
+    denominator_2 = num2.denominator.value
+    common_denominator = denominator_1 * denominator_2
+
+    numerator_1 = numerator_1 * denominator_2
+    numerator_2 = numerator_2 * denominator_1
+
+    total_numerator = numerator_1 + numerator_2
+    # Fraction method only accepts Number objects
+    return Fraction(Number(total_numerator), Number(common_denominator))
+
+def subtract(num1, num2):
+    num2.sign = -num2.sign
+    return add(num1, num2)
 # end CAS code
 
 
@@ -224,58 +273,38 @@ if check_roots:
         fraction_index += 1
     # synthetic division function
     # takes in a list of coefficients and dividing root and outputs false if the polynomial is not a root, and outputs new divided coefficients if it is a root
+
     def synthetic_division(divide_root, coefficients):
-        divide_root = divide_root*-1
+        # coeeficients are fraction objects
+        # divide_root is a Fraction object
+        divide_root.sign = divide_root.sign * -1
         elements_number = len(coefficients)
         last_element_index = elements_number - 1
-        k = last_element_index
+        k = 0
         out_array = []
-        while k >= 0:
-            if k == last_element_index:
+        while k <= last_element_index:
+            if k == 0:
                 out_array.append(coefficients[k])
-                k-=1
+                k+=1
                 # go to top of while loop 
                 continue
             else:
-                out_array.append(out_array[-1]*divide_root + coefficients[k])
-                k-=1
-        # if the last element is not zero, than the possible root is not a root of the polynomial
-        if out_array[-1] != 0:
+                # out_array.append(out_array[-1]*divide_root + coefficients[k])
+                # out_array.append(add(multiply(out_array[-1], divide_root) , coefficients[k]))
+                out_array.append(add(multiply(out_array[-1], divide_root) , coefficients[k]))
+
+                k+=1
+        if out_array[-1].numerator.value != 0:
             return False
         else:
-            # remove last element
             out_array.pop()
             return out_array
-    # test the synthetic division function
-    # print testing synthetic division function
-    print(synthetic_division(-3, polynomial_coefficients))
 
-    # synthetic divide until the polynomial can no longer be divided
+    out_array = synthetic_division(Fraction(Number(1), Number(1)), [Fraction(Number(1), Number(1)), Fraction(Number(2), Number(1)), Fraction(Number(1), Number(1))])
+    for element in out_array:
+        # print result of synthetic division
+        print(element.numerator.value, element.denominator.value)
 
-
-
-
-    # plug possible roots into the polynomial
-    roots = []
-    # continue to synthetic divide until the polynomial can no longer be divided
-    division_possible = True
-    while division_possible:
-        # try to divide the polynomial by the possible roots
-        division_possible = False
-        for possible_root in possible_roots:
-            # if the polynomial can be divided by the possible root
-            if synthetic_division(possible_root[2], polynomial_coefficients):
-                # add the possible root to the roots list
-                roots.append(possible_root[2])
-                # the new polynomial is the remainder of the division
-                division_result = synthetic_division(possible_root[2], polynomial_coefficients)
-                # the result of division is forwards, but the coefficients are backwards
-                # so reverse the coefficients
-                division_result.reverse()
-                # the new polynomial is the remainder of the division
-                polynomial_coefficients = division_result
-                division_possible = True
-        # if the polynomial can no longer be divided, division_possible is false, and the loop will end
 
 
     # print the roots in latex form
