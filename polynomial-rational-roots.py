@@ -306,22 +306,5 @@ if check_roots:
         print(element.numerator.value, element.denominator.value)
 
 
-
-    # print the roots in latex form
-    print("the roots are: ")
-    # create a list of the latex forms
-    roots_latex = []
-    for root in roots:
-        roots_latex.append("\\frac{" + str(root[0]) + "}{" + str(root[1]) + "}")
-    # create a string with all of the roots in latex form
-    roots_latex_string = ""
-    for root in roots_latex:
-        roots_latex_string += root + ", "
-    # remove last comma and space if there are roots
-    if roots_latex_string != "":
-        roots_latex_string = roots_latex_string[:-2]
-
-    # print the string
-    print(roots_latex_string)
 else:
     print("Thank you for using this program!")
