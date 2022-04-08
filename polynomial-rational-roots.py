@@ -2,6 +2,7 @@
 import math
 
 def primefactors(n):
+    assert isinstance(n, int) or isinstance(n, float), 'Integers or floats only!'
     factors = []
     # if n is zero, return [0]
     if n == 0:
@@ -25,6 +26,8 @@ def primefactors(n):
  
 class Number:
     def __init__(self, value):
+        # only allow integers or floats
+        assert isinstance(value, int) or isinstance(value, float), 'Integers or floats only!'
         self.value = value
         self.factors = primefactors(abs(value))
         # get the sign of value
@@ -40,6 +43,8 @@ class Number:
 
 class Fraction:
     def __init__(self, numerator, denominator):
+        assert isinstance(numerator, Number), 'Number objects only!'
+        assert isinstance(denominator, Number), 'Number objects only!'
         # takes in 2 number objects
         self.numerator = numerator
         self.denominator = denominator
@@ -79,6 +84,11 @@ class Fraction:
 
 def multiply(num1, num2):
     # the numbers can either be fractions or numbers
+    # ensure num1 and num2 are either fractions or numbers, raise an error if not
+    if type(num1) != Number and type(num1) != Fraction:
+        raise TypeError('num1 must be a Number or Fraction object')
+    if type(num2) != Number and type(num2) != Fraction:
+        raise TypeError('num2 must be a Number or Fraction object')
     # if the numbers are numbers, convert them to fractions
     if type(num1) == Number:
         num1 = Fraction(num1, Number(1))
@@ -106,6 +116,9 @@ def multiply(num1, num2):
     return new_fraction
 
 def reciprocal(num):
+    # ensure right type is entered for num
+    if type(num) != Number and type(num) != Fraction:
+        raise TypeError('num must be a Number or Fraction object')
     # the numbers can either be fractions or numbers
     # if the numbers are numbers, convert them to fractions
     if type(num) == Number:
@@ -275,7 +288,7 @@ if check_roots:
     # takes in a list of coefficients and dividing root and outputs false if the polynomial is not a root, and outputs new divided coefficients if it is a root
 
     def synthetic_division(divide_root, coefficients):
-        # coeeficients are fraction objects
+        # coeeficients are a list of fraction objects
         # divide_root is a Fraction object
         divide_root.sign = divide_root.sign * -1
         elements_number = len(coefficients)
@@ -299,11 +312,18 @@ if check_roots:
         else:
             out_array.pop()
             return out_array
+    # get array of numbers to test synth. division quickly
+    divide_array = [1, -3, 5, -17, 6]
+    coefficients_test = []
+    for coefficient in divide_array:
+        coefficients_test.append(Fraction(Number(coefficient), Number(1)))
 
-    out_array = synthetic_division(Fraction(Number(1), Number(1)), [Fraction(Number(1), Number(1)), Fraction(Number(2), Number(1)), Fraction(Number(1), Number(1))])
+    out_array = synthetic_division(Fraction(Number(3), Number(1)), coefficients_test)
     for element in out_array:
         # print result of synthetic division
-        print(element.numerator.value, element.denominator.value)
+        # print(element.numerator.value, element.denominator.value)
+        print("factors are ", element.numerator.factors, " and sign is ", element.sign)
+
 
 
 else:
